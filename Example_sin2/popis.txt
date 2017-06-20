@@ -1,0 +1,9 @@
+Rekonstrukcia orezanej sinusovky pomocou l1-magic
+
+generateSinus.m generuje orezanu sinusovku
+
+Rekonstrukcia:
+recontructSinus_eq.m  - rekonstrukcia s podmienkami rovnosti (pre nezasumene signaly)
+recontructSinus_qc.m  - rekonstrukcia s kvadratickymi podmienkami (pre zasumene signaly)
+
+
