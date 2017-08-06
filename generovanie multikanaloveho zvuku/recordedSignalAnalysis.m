@@ -1,0 +1,52 @@
+clear all;
+close all;
+clc;
+
+fvz = 44100;
+w_size=0.2*fvz;  %200milisekundové okno na analızu
+beg_rec = 1; %zaèiatok naèítavania súboru
+end_rec = w_size; %koniec naèítavania súboru
+
+analysis_length = 30;
+freq_pointer = zeros(analysis_length,1); %pozícia frekvencie analyzovaného okna
+freq_Hz = zeros(analysis_length,1);
+mag_pointer = zeros(analysis_length,1); %ve¾kos amplitúdy maximálnej frekvencie analyzovaného okna
+
+%pre spustenie treba zmeni cestu
+filename = 'c:\Users\weya_\Disk Google\PHD\dizertacka synchro\CS priklady\generovanie multikanaloveho zvuku\nahravky\rec_100_300_500_700_mono.wav';
+
+for rep=1:analysis_length
+    [sig,Fs]=audioread(filename, [beg_rec, end_rec]);
+    fft_sig=abs(real(fft(sig)));
+    [mag_pointer(rep),freq_pointer(rep)] = max(fft_sig);
+    freq_Hz(rep) = freq_pointer(rep)*5; %44100Hz/8820points
+    beg_rec = beg_rec+w_size;
+    end_rec = end_rec+w_size;
+end
+
+%tu u poznám ktoré frekvencie sú v ktorom okne najviac zastúpené
+freq_treshold = 6; %Hz
+sig_middle_time = []; %sted burst signálu
+
+for i=1:analysis_length 
+    if abs(freq_Hz(i)-100) < 15  %h¾adanie nosnej frekv.; teraz nastavené na 100Hz
+        [sig,Fs]=audioread(filename, [((i-1)*w_size)+1, i*w_size]);
+        [max_amp,max_amp_pos]=max(abs(sig)); %maximálna amplitúda a jej pozícia
+        if max_amp > 0.01
+            sig_middle = max_amp_pos + (i-1)*w_size;
+            sig_middle_time = [sig_middle_time (sig_middle/44100)];
+        end
+    end
+end
+    
+% for rep=2:analysis_length
+%definovanie nového (spoloèného) stredu ak analyzujeme burst ktorı je rozdelenı v dvoch po sebe analyzovanıch oknách (kadé okno 200ms)
+%     if abs(freq_Hz(rep)-freq_Hz(rep-1))<freq_treshold 
+%         [sig,Fs]=audioread(filename, [((rep-2)*w_size)+1, (rep)*w_size]);
+%         [max_amp,max_amp_pos]=max(abs(sig));
+%         if max_amp > 0.01
+%             sig_middle = max_amp_pos + (rep-2)*w_size;
+%             sig_middle_time = [sig_middle_time (sig_middle/44100)];
+%         end
+%     end
+% end
